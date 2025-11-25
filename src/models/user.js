@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 const userSchema = new mongoose.Schema({
     user_name:{ type:String,required:true,unique:true,trim:true,lowercase:true,index:true},
     email: { type: String, required: true, unique: true },
@@ -21,6 +23,32 @@ const userSchema = new mongoose.Schema({
     lastactive: { type: Date, default: Date.now },
     bio:{type:String,required:true}
 },{timestamps:true});
+
+userSchema.pre("save"), async function (next){
+    if(!this.isModified("password"))return next();
+    this.password = bcrypt.hash(this.password,10)
+    next();
+}
+
+//custom methods this is nothing but simple function which is created by coder on schema
+userSchema.methods.ischeckpassword = async function(password){
+    return await bcrypt.compare(password,  this.password);
+}
+
+userSchema.methods.generateaccesstoken = function(){
+    return jwt.sign({
+        _id:this._id,
+        name:this.user_name
+    },process.env.access_token,
+    {expiresIn:process.env.access_expiry})
+}
+
+userSchema.methods.generateaccesstoken = function(){
+     return jwt.sign({
+        _id:this._id,
+    },process.env.refresh_token,
+    {expiresIn:process.env.refresh_expiry})
+}
 
 
 export const user = mongoose.model("User",userSchema)
