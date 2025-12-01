@@ -24,11 +24,12 @@ const userSchema = new mongoose.Schema({
     bio:{type:String,required:true}
 },{timestamps:true});
 
-userSchema.pre("save"), async function (next){
-    if(!this.isModified("password"))return next();
-    this.password = bcrypt.hash(this.password,10)
+userSchema.pre("save", async function (next) {
+    if (!this.isModified("password")) return next();
+    this.password = await bcrypt.hash(this.password, 10);
     next();
-}
+});
+
 
 //custom methods this is nothing but simple function which is created by coder on schema
 userSchema.methods.ischeckpassword = async function(password){
@@ -51,4 +52,4 @@ userSchema.methods.generaterefreshtoken = function(){
 }
 
 
-export const user = mongoose.model("User",userSchema)
+export const {user} = mongoose.model("User",userSchema)
