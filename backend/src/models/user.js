@@ -13,7 +13,7 @@ const userSchema = new mongoose.Schema({
     salary:{type:Number,required:true},
     mobile_No:{type:String,required:true,unique:true},
     education: {type:String},
-    Avatar: {type:String},//cloudinary url
+    avatar: {type:String},//cloudinary url
     refreshToken: { type: String },
     favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     sentrequests: [{type: mongoose.Schema.Types.ObjectId,ref: "User",index: true}],
@@ -27,7 +27,7 @@ const userSchema = new mongoose.Schema({
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
     this.password = await bcrypt.hash(this.password, 10);
-    next();
+    
 });
 
 
@@ -52,4 +52,4 @@ userSchema.methods.generaterefreshtoken = function(){
 }
 
 
-export const {user} = mongoose.model("User",userSchema)
+export const user = mongoose.model("User",userSchema)
